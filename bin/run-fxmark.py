@@ -27,7 +27,7 @@ class Runner(object):
     LOOPDEV = "/dev/loopX"
     NVMEDEV = "/dev/nvme0n1pX"
     HDDDEV  = "/dev/sdX"
-    SSDDEV  = "/dev/sdY"
+    SSDDEV  = "/dev/sdb10"
 
     # test core granularity
     CORE_FINE_GRAIN   = 0
@@ -517,7 +517,7 @@ if __name__ == "__main__":
     run_config = [
         (Runner.CORE_FINE_GRAIN,
          PerfMon.LEVEL_LOW,
-         ("mem", "*", "DWOL", "80", "directio")),
+         ("ssd", "ext4", "DRBL", "*", "directio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,
