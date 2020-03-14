@@ -95,6 +95,33 @@ class Runner(object):
             # "DRBH_bg",
             # "DRBL_bg",
             # "MRDL_bg",
+
+            # overlayfs
+            "MROH_overlay",
+            "MROU_overlay",
+            "MROL_overlay",
+            "MRRH_overlay",
+            "MRRU_overlay",
+            "MRRL_overlay",
+            "MWCH_overlay",
+            "MWCU_overlay",
+            "MWCL_overlay",
+            "MWUH_overlay",
+            "MWUU_overlay",
+            "MWUL_overlay",
+            "DRRH_overlay",
+            "DRRU_overlay",
+            "DRRL_overlay",
+            "DWWH_overlay",
+            "DWWU_overlay",
+            "DWWL_overlay",
+            "DWAH_overlay",
+            "DWAU_overlay",
+            "DWAL_overlay",
+            "DWTH_overlay",
+            "DWTU_overlay",
+            "DWTL_overlay",
+
         ]
         self.BENCH_BG_SFX   = "_bg"
 

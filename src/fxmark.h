@@ -4,6 +4,7 @@
 #include "bench.h"
 
 #define FX_OPT_MAX_PRIVATE 4
+#define FILE_MAX 2000000
 
 struct fx_opt {
 	char root[PATH_MAX];
@@ -51,5 +52,30 @@ extern struct bench_operations u_file_cr_ops;
 extern struct bench_operations u_file_rm_ops;
 extern struct bench_operations u_sh_file_rm_ops;
 extern struct bench_operations u_file_tr_ops;
+
+extern struct bench_operations o_opn_hst_ops;
+extern struct bench_operations o_opn_up_ops;
+extern struct bench_operations o_opn_lw_ops;
+extern struct bench_operations o_crt_hst_ops;
+extern struct bench_operations o_crt_up_ops;
+extern struct bench_operations o_crt_lw_ops;
+extern struct bench_operations o_ulnk_hst_ops;
+extern struct bench_operations o_ulnk_up_ops;
+extern struct bench_operations o_ulnk_lw_ops;
+extern struct bench_operations o_rdir_hst_ops;
+extern struct bench_operations o_rdir_up_ops;
+extern struct bench_operations o_rdir_lw_ops;
+extern struct bench_operations o_rd_hst_ops;
+extern struct bench_operations o_rd_up_ops;
+extern struct bench_operations o_rd_lw_ops;
+extern struct bench_operations o_wrt_hst_ops;
+extern struct bench_operations o_wrt_up_ops;
+extern struct bench_operations o_wrt_lw_ops;
+extern struct bench_operations o_apd_hst_ops;
+extern struct bench_operations o_apd_up_ops;
+extern struct bench_operations o_apd_lw_ops;
+extern struct bench_operations o_trnc_hst_ops;
+extern struct bench_operations o_trnc_up_ops;
+extern struct bench_operations o_trnc_lw_ops;
 
 #endif /* __FX_H__ */

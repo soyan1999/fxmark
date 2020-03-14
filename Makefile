@@ -26,7 +26,15 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/DRBM_bg.c $(SRC)/MRPM_bg.c \
 		  $(SRC)/MWUM.c $(SRC)/MWUL.c \
 		  $(SRC)/DWTL.c $(SRC)/MRPH.c \
-		  $(SRC)/MRPL.c
+		  $(SRC)/MRPL.c \
+		  $(SRC)/MROH_overlay.c $(SRC)/MROL_overlay.c $(SRC)/MROU_overlay.c \
+		  $(SRC)/MRRH_overlay.c $(SRC)/MRRL_overlay.c $(SRC)/MRRU_overlay.c \
+		  $(SRC)/MWCH_overlay.c $(SRC)/MWCL_overlay.c $(SRC)/MWCU_overlay.c \
+		  $(SRC)/MWUH_overlay.c $(SRC)/MWUL_overlay.c $(SRC)/MWUU_overlay.c \
+		  $(SRC)/DRRH_overlay.c $(SRC)/DRRL_overlay.c $(SRC)/DRRU_overlay.c \
+		  $(SRC)/DWWH_overlay.c $(SRC)/DWWL_overlay.c $(SRC)/DWWU_overlay.c \
+		  $(SRC)/DWAH_overlay.c $(SRC)/DWAL_overlay.c $(SRC)/DWAU_overlay.c \
+		  $(SRC)/DWTH_overlay.c $(SRC)/DWTL_overlay.c $(SRC)/DWTU_overlay.c \
 DEPS	= $(wildcard $(SRC)/*.h) $(LIBS) $(TC)
 BINS	= $(BIN)/fxmark
 CPUPOLS = $(SRC)/cpuinfo $(SRC)/cpupol.h $(BIN)/cpupol.py
