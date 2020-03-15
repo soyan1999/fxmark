@@ -63,7 +63,7 @@ static int pre_work(struct worker *worker)
     if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
         goto err_out;
 
-    for(worker->private[0] = 0; worker->private[0] < 100000; worker->private[0]++) {
+    for(worker->private[0] = 0; worker->private[0] < PAGE_MAX; worker->private[0]++) {
         rc = write(fd, page, PAGE_SIZE);
         if (rc != PAGE_SIZE) {
             if (errno == ENOSPC) {
