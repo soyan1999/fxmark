@@ -53,7 +53,7 @@ err_out:
 	goto out;
 }
 
-struct bench_operations o_ctr_hst_ops = {
+struct bench_operations o_crt_hst_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
 };

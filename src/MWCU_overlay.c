@@ -102,7 +102,7 @@ err_out:
     goto out;
 }
 
-struct bench_operations o_ctr_up_ops = {
+struct bench_operations o_crt_up_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
     .post_work = post_work,
