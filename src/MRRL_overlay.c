@@ -6,6 +6,7 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <dirent.h>
+#include <stdlib.h>
 #include "fxmark.h"
 #include "util.h"
 
@@ -62,6 +63,9 @@ static int pre_work(struct worker *worker)
         }
         close(fd);
     }
+
+    sprintf(cmd, "sudo mount -t overlay overlay -o lowerdir=%s,upperdir=%s,workdir=%s %s", lower, upper, work, merged);
+    if (system(cmd)) goto err_out;
 out:
     return rc;
 err_out:
