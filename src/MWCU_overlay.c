@@ -64,10 +64,12 @@ static int main_work(struct worker *worker)
 	struct bench *bench = worker->bench;
 	uint64_t iter;
 	int rc = 0;
+    int ncpu = bench->ncpu;
+    int max = FILE_MAX / ncpu / 2;
 
 	set_test_root(worker, test_root);
     sprintf(test_dir, "%s/merged/dir", test_root);
-	for (iter = 0; !bench->stop; ++iter) {
+	for (iter = 0; !bench->stop && iter < max; ++iter) {
 		char file[PATH_MAX];
 		int fd;
 		/* create and close */
