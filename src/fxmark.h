@@ -4,8 +4,8 @@
 #include "bench.h"
 
 #define FX_OPT_MAX_PRIVATE 4
-#define FILE_MAX 1000000
-#define PAGE_MAX 1000000
+#define FILE_MAX 50000000
+#define PAGE_MAX 50000000
 
 struct fx_opt {
 	char root[PATH_MAX];
