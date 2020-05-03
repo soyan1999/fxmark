@@ -109,6 +109,7 @@ class Runner(object):
             "MWUH_overlay",
             "MWUU_overlay",
             "MWUL_overlay",
+            "MWRU_overlay",
             "DRRH_overlay",
             "DRRU_overlay",
             "DRRL_overlay",

@@ -4,8 +4,8 @@
 #include "bench.h"
 
 #define FX_OPT_MAX_PRIVATE 4
-#define FILE_MAX 50000000
-#define PAGE_MAX 50000000
+#define FILE_MAX 10000000
+#define BLOCK_MAX 20000000
 
 struct fx_opt {
 	char root[PATH_MAX];
@@ -63,6 +63,7 @@ extern struct bench_operations o_crt_lw_ops;
 extern struct bench_operations o_ulnk_hst_ops;
 extern struct bench_operations o_ulnk_up_ops;
 extern struct bench_operations o_ulnk_lw_ops;
+extern struct bench_operations o_rnm_up_ops;
 extern struct bench_operations o_rdir_hst_ops;
 extern struct bench_operations o_rdir_up_ops;
 extern struct bench_operations o_rdir_lw_ops;

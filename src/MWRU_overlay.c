@@ -1,7 +1,3 @@
-/**
- * Nanobenchmark: Read operation
- *   RF. PROCESS = {read private file}
- */
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -22,80 +18,60 @@ static void set_test_root(struct worker *worker, char *test_root)
 
 static int pre_work(struct worker *worker)
 {
-    char *page=NULL;
     struct bench *bench = worker->bench;
     char test_root[PATH_MAX];
-    char test_dir[PATH_MAX];
+    char src_dir[PATH_MAX];
+    char dst_dir[PATH_MAX];
     char merged[PATH_MAX];
     char upper[PATH_MAX];
     char lower[PATH_MAX];
     char work[PATH_MAX];
     char cmd[PATH_MAX];
     char file[PATH_MAX];
-    int fd=-1, rc = 0;
+	int fd, rc = 0;
     int ncpu = bench->ncpu;
-    int max = BLOCK_MAX / ncpu;
-
-    /* allocate data buffer aligned with pagesize*/
-    if(posix_memalign((void **)&(worker->page), PAGE_SIZE, PAGE_SIZE))
-        goto err_out;
-    page = worker->page;
-    if (!page)
-        goto err_out;
+    int max = FILE_MAX / ncpu / 2;
 
     /* create test root */
     set_test_root(worker, test_root);
     sprintf(merged, "%s/merged", test_root);
-    sprintf(test_dir, "%s/upper/dir", test_root);
+    sprintf(src_dir, "%s/upper/src", test_root);
+    sprintf(dst_dir, "%s/upper/dst", test_root);
     sprintf(upper, "%s/upper", test_root);
     sprintf(lower, "%s/lower", test_root);
     sprintf(work, "%s/work", test_root);
 
 	rc = mkdir_p(merged);
     if (rc) goto err_out;
-    rc = mkdir_p(test_dir);
+    rc = mkdir_p(src_dir);
+    if (rc) goto err_out;
+    rc = mkdir_p(dst_dir);
     if (rc) goto err_out;
     rc = mkdir_p(lower);
     if (rc) goto err_out;
     rc = mkdir_p(work);
     if (rc) goto err_out;
 
-    /* create a test file */
-    snprintf(file, PATH_MAX, "%s/n_file_rd.dat", test_root);
-    if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
-        goto err_out;
-
-    for(worker->private[0] = 0; worker->private[0] < max; worker->private[0]++) {
-        rc = write(fd, page, PAGE_SIZE);
-        if (rc != PAGE_SIZE) {
-            if (errno == ENOSPC) {
-                worker->private[0]--;
-                break;
+	/* create test file */
+    for(;worker->private[0] < max;++worker->private[0]){
+	    sprintf(file, "%s/n-%" PRIu64 ".dat", src_dir, worker->private[0]);
+	    if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+        {
+            if(errno == ENOSPC){
+                --worker->private[0];
+                rc = 0;
+                goto out;
             }
+            rc = errno;
             goto err_out;
         }
+        close(fd);
     }
-    rc = 0;
-
-    fsync(fd);
-    close(fd);
 
     sprintf(cmd, "sudo mount -t overlay overlay -o lowerdir=%s,upperdir=%s,workdir=%s %s", lower, upper, work, merged);
     if (system(cmd)) goto err_out;
-
-    if ((fd = open(file, O_RDWR, S_IRWXU)) == -1)
-        goto err_out;
-
-    /* set flag with O_DIRECT if necessary*/
-    if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT) == -1))
-        goto err_out;
-
 out:
-    /* put fd to worker's private */
-    worker->private[1] = (uint64_t)fd;
-    free(page);
-    worker->page = NULL;
-	return rc;
+    return rc;
 err_out:
 	bench->stop = 1;
 	rc = errno;
@@ -104,20 +80,26 @@ err_out:
 
 static int main_work(struct worker *worker)
 {
-    struct bench *bench = worker->bench;
-    int fd=-1, rc = 0;
-    uint64_t iter = 0;
+	struct bench *bench = worker->bench;
+	int rc = 0;
+	uint64_t iter = 0;
+    char test_root[PATH_MAX];
+    char src_dir[PATH_MAX];
+    char dst_dir[PATH_MAX];
+    char file_old[PATH_MAX];
+    char file_new[PATH_MAX];
 
-    fd = (int)worker->private[1];
-    for (iter = worker->private[0] - 1; iter > 0 && !bench->stop; --iter) {
-        if (ftruncate(fd, iter * PAGE_SIZE) == -1) {
-            rc = errno;
-            goto err_out;
-        }
-    }
+    set_test_root(worker, test_root);
+    sprintf(src_dir, "%s/merged/src", test_root);
+    sprintf(dst_dir, "%s/merged/dst", test_root);
+	for (iter = 0; iter < worker->private[0] && !bench->stop; ++iter) {
+	    sprintf(file_old, "%s/n-%" PRIu64 ".dat", src_dir, iter);
+        sprintf(file_new, "%s/n-%" PRIu64 ".dat", dst_dir, iter);
+        rc = rename(file_old, file_new);
+        if (rc) goto err_out;
+	}
 out:
-	close(fd);
-	worker->works = (double)(worker->private[0] - iter);
+    worker->works = (double)iter;
 	return rc;
 err_out:
 	bench->stop = 1;
@@ -141,8 +123,8 @@ err_out:
     goto out;
 }
 
-struct bench_operations o_trnc_up_ops = {
-    .pre_work  = pre_work,
-    .main_work = main_work,
+struct bench_operations o_rnm_up_ops = {
+	.pre_work  = pre_work, 
+	.main_work = main_work,
     .post_work = post_work,
 };

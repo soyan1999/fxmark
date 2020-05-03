@@ -77,7 +77,7 @@ err_out:
 static int main_work(struct worker *worker)
 {
 	struct bench *bench = worker->bench;
-	int fd, rc = 0;
+	int rc = 0;
 	uint64_t iter = 0;
     char test_root[PATH_MAX];
     char test_dir[PATH_MAX];

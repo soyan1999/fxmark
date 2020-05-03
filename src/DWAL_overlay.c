@@ -92,11 +92,13 @@ static int main_work(struct worker *worker)
     char *page=worker->page;
     int fd=-1, rc = 0;
     uint64_t iter = 0;
+    int ncpu = bench->ncpu;
+    int max = BLOCK_MAX / ncpu;
 
     assert(page);
 
     fd = (int)worker->private[0];
-    for (iter = 0; !bench->stop && iter < PAGE_MAX; ++iter) {
+    for (iter = 0; !bench->stop && iter < max; ++iter) {
         if (write(fd, page, PAGE_SIZE) != PAGE_SIZE)
             goto err_out;
     }

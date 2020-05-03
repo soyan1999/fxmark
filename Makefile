@@ -34,7 +34,8 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/DRRH_overlay.c $(SRC)/DRRL_overlay.c $(SRC)/DRRU_overlay.c \
 		  $(SRC)/DWWH_overlay.c $(SRC)/DWWL_overlay.c $(SRC)/DWWU_overlay.c \
 		  $(SRC)/DWAH_overlay.c $(SRC)/DWAL_overlay.c $(SRC)/DWAU_overlay.c \
-		  $(SRC)/DWTH_overlay.c $(SRC)/DWTL_overlay.c $(SRC)/DWTU_overlay.c
+		  $(SRC)/DWTH_overlay.c $(SRC)/DWTL_overlay.c $(SRC)/DWTU_overlay.c \
+		  $(SRC)/MWRU_overlay.c
 DEPS	= $(wildcard $(SRC)/*.h) $(LIBS) $(TC)
 BINS	= $(BIN)/fxmark
 CPUPOLS = $(SRC)/cpuinfo $(SRC)/cpupol.h $(BIN)/cpupol.py
