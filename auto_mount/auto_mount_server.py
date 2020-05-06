@@ -50,6 +50,9 @@ class AutoMountServer:
                 return_code = self.exec_cmd("mount -t ext4 %s %s" % (dev, mount_point))
                 if return_code != 0:
                     return False
+                return_code = self.exec_cmd("chmod 777 %s" % (mount_point,))
+                if return_code != 0:
+                    return False
                 mount_inf[1] = mount_point
                 mount_inf[2] = True
                 print("mount -t ext4 %s %s" % (dev, mount_point))
