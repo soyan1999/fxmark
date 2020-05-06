@@ -1,8 +1,3 @@
-/**
- * Nanobenchmark: ADD
- *   IA. PROCESS = {create empty files at /test/$PROCESS}
- *      - TEST: inode alloc
- */	      
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -11,39 +6,38 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "fxmark.h"
 #include "util.h"
 
 static void set_test_root(struct worker *worker, char *test_root)
 {
-	struct fx_opt *fx_opt = fx_opt_worker(worker);
-	sprintf(test_root, "%s/%d", fx_opt->root, worker->id);
+    struct fx_opt *fx_opt = fx_opt_worker(worker);
+    sprintf(test_root, "%s/%d", fx_opt->root, worker->id);
 }
 
 static int pre_work(struct worker *worker)
 {
-	char test_root[PATH_MAX];
+    struct bench *bench = worker->bench;
+    char test_root[PATH_MAX];
     char test_dir[PATH_MAX];
     char merged[PATH_MAX];
     char upper[PATH_MAX];
     char lower[PATH_MAX];
     char work[PATH_MAX];
     char cmd[PATH_MAX];
-    char mount_point[PATH_MAX];
-    int rc = 0;
+    char file[PATH_MAX];
+	int fd, rc = 0;
+    int ncpu = bench->ncpu;
+    int max = FILE_MAX / ncpu / 2;
 
-	set_test_root(worker, test_root);
+    /* create test root */
+    set_test_root(worker, test_root);
     sprintf(merged, "%s/merged", test_root);
-    sprintf(mount_point, "%s/mount_point", test_root);
-    sprintf(test_dir, "%s/mount_point/upper/dir", test_root);
-    sprintf(upper, "%s/mount_point/upper", test_root);
+    sprintf(test_dir, "%s/upper/dir", test_root);
+    sprintf(upper, "%s/upper", test_root);
     sprintf(lower, "%s/lower", test_root);
-    sprintf(work, "%s/mount_point/work", test_root);
-
-    rc = mkdir_p(mount_point);
-    if (rc) goto err_out;
-    sprintf(cmd, "sudo python3 /home/xiaoli7/soyan/fxmark/auto_mount/auto_mount_client.py 10088 mount %s/mount_point", test_root);
-    if (system(cmd)!=0) goto err_out;
+    sprintf(work, "%s/work", test_root);
 
 	rc = mkdir_p(merged);
     if (rc) goto err_out;
@@ -54,40 +48,50 @@ static int pre_work(struct worker *worker)
     rc = mkdir_p(work);
     if (rc) goto err_out;
 
+	/* create test file */
+    for(;worker->private[0] < max;++worker->private[0]){
+	    sprintf(file, "%s/n-%" PRIu64 ".dat", test_dir, worker->private[0]);
+	    if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+        {
+            if(errno == ENOSPC){
+                --worker->private[0];
+                rc = 0;
+                goto out;
+            }
+            rc = errno;
+            goto err_out;
+        }
+        close(fd);
+    }
+
     sprintf(cmd, "sudo mount -t overlay overlay -o lowerdir=%s,upperdir=%s,workdir=%s %s", lower, upper, work, merged);
     if (system(cmd)) goto err_out;
-
 out:
-	return rc; 
+    return rc;
 err_out:
+	bench->stop = 1;
 	rc = errno;
 	goto out;
 }
 
 static int main_work(struct worker *worker)
 {
-	char test_root[PATH_MAX];
-    char test_dir[PATH_MAX];
 	struct bench *bench = worker->bench;
-	uint64_t iter;
 	int rc = 0;
-    int ncpu = bench->ncpu;
-    int max = FILE_MAX / ncpu / 2;
+	uint64_t iter = 0;
+    char test_root[PATH_MAX];
+    char test_dir[PATH_MAX];
+    char file[PATH_MAX];
 
-	set_test_root(worker, test_root);
+    set_test_root(worker, test_root);
     sprintf(test_dir, "%s/merged/dir", test_root);
-	for (iter = 0; !bench->stop && iter < max; ++iter) {
-		char file[PATH_MAX];
-		int fd;
-		/* create and close */
-		snprintf(file, PATH_MAX, "%s/crt-%" PRIu64 ".dat", 
-			 test_dir, iter);
-		if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
-			goto err_out;
-		close(fd);
+	for (iter = 0; iter < worker->private[0] && !bench->stop; ++iter) {
+	    sprintf(file, "%s/n-%" PRIu64 ".dat", test_dir, iter);
+	    if(unlink(file))
+            goto err_out;
 	}
 out:
-	worker->works = (double)iter;
+    worker->works = (double)iter;
 	return rc;
 err_out:
 	bench->stop = 1;
@@ -103,8 +107,6 @@ static int post_work(struct worker *worker) {
     set_test_root(worker, test_root);
     sprintf(cmd, "sudo umount %s/merged", test_root);
     if(system(cmd)) goto err_out;
-    sprintf(cmd, "/home/xiaoli7/soyan/fxmark/auto_mount/auto_mount_client.py 10088 umount %s/mount_point", test_root);
-    if (system(cmd)!=0) goto err_out;
 
 out:
     return rc;
@@ -113,7 +115,7 @@ err_out:
     goto out;
 }
 
-struct bench_operations o_crt_up_ops = {
+struct bench_operations o_ulnk_up_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
     .post_work = post_work,
