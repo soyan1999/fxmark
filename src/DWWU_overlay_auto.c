@@ -32,6 +32,7 @@ static int pre_work(struct worker *worker)
     char work[PATH_MAX];
     char cmd[PATH_MAX];
     char file[PATH_MAX];
+    char mount_point[PATH_MAX];
     int fd=-1, rc = 0;
 
     /* allocate data buffer aligned with pagesize*/
@@ -44,10 +45,16 @@ static int pre_work(struct worker *worker)
     /* create test root */
     set_test_root(worker, test_root);
     sprintf(merged, "%s/merged", test_root);
-    sprintf(test_dir, "%s/upper/dir", test_root);
-    sprintf(upper, "%s/upper", test_root);
+    sprintf(mount_point, "%s/mount_point", test_root);
+    sprintf(test_dir, "%s/mount_point/upper/dir", test_root);
+    sprintf(upper, "%s/mount_point/upper", test_root);
     sprintf(lower, "%s/lower", test_root);
-    sprintf(work, "%s/work", test_root);
+    sprintf(work, "%s/mount_point/work", test_root);
+
+    rc = mkdir_p(mount_point);
+    if (rc) goto err_out;
+    sprintf(cmd, "sudo python3 /home/xiaoli7/soyan/fxmark/auto_mount/auto_mount_client.py 10088 mount %s/mount_point", test_root);
+    if (system(cmd)!=0) goto err_out;
 
 	rc = mkdir_p(merged);
     if (rc) goto err_out;
@@ -123,6 +130,8 @@ static int post_work(struct worker *worker) {
     set_test_root(worker, test_root);
     sprintf(cmd, "sudo umount %s/merged", test_root);
     if(system(cmd)) goto err_out;
+    sprintf(cmd, "/home/xiaoli7/soyan/fxmark/auto_mount/auto_mount_client.py 10088 umount %s/mount_point", test_root);
+    if (system(cmd)!=0) goto err_out;
 
 out:
     return rc;
