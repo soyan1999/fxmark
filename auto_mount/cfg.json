@@ -1,0 +1,17 @@
+{
+    "port" : 10088,
+    "devs" : [
+            "/dev/vdb18", 
+            "/dev/vdb19", 
+            "/dev/vdb20", 
+            "/dev/vdb21", 
+            "/dev/vdb22", 
+            "/dev/vdb23", 
+            "/dev/vdb24", 
+            "/dev/vdb25", 
+            "/dev/vdb26", 
+            "/dev/vdb27", 
+            "/dev/vdb28", 
+            "/dev/vdb29"
+        ]
+}
