@@ -4,8 +4,10 @@
 #include "bench.h"
 
 #define FX_OPT_MAX_PRIVATE 4
-#define FILE_MAX 10000000
+#define FILE_MAX 30000000
 #define BLOCK_MAX 20000000
+#define SG_FILE_MAX 3000000
+#define SG_BLOCK_MAX 10000000
 
 struct fx_opt {
 	char root[PATH_MAX];

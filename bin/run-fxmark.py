@@ -27,7 +27,7 @@ class Runner(object):
     LOOPDEV = "/dev/loopX"
     NVMEDEV = "/dev/nvme0n1pX"
     HDDDEV  = "/dev/sdX"
-    SSDDEV  = "/dev/vdb18"
+    SSDDEV  = "/dev/vdb30"
 
     # test core granularity
     CORE_FINE_GRAIN   = 0
@@ -239,7 +239,7 @@ class Runner(object):
         test_hw_thr_cnts = hw_thr_cnts_map.get(self.CORE_GRAIN,
                                                cpupol.test_hw_thr_cnts_fine_grain)
         for n in test_hw_thr_cnts:
-            if n > self.npcpu:
+            if n > self.nhwthr:
                 break
             ncores.append(n)
         return ncores
@@ -544,14 +544,20 @@ if __name__ == "__main__":
     # TODO: make it scriptable
     run_config = [
         (Runner.CORE_FINE_GRAIN,
-         PerfMon.LEVEL_LOW,
-         ("ssd", "ext4", "DWTL_overlay", "*", "directio")),
-        (Runner.CORE_FINE_GRAIN,
-         PerfMon.LEVEL_LOW,
-         ("ssd", "ext4", "DWTU_overlay", "*", "directio")),
-        (Runner.CORE_FINE_GRAIN,
-         PerfMon.LEVEL_LOW,
-         ("ssd", "ext4", "DWTH_overlay", "*", "directio")),
+         PerfMon.LEVEL_PERF_RECORD,
+         ("ssd", "ext4", "MROL_overlay", "*", "bufferedio")),
+        # (Runner.CORE_FINE_GRAIN,
+        #  PerfMon.LEVEL_PERF_RECORD,
+        #  ("ssd", "ext4_no_jnl", "DWTU_overlay", "*", "bufferedio")),
+        # (Runner.CORE_FINE_GRAIN,
+        #  PerfMon.LEVEL_PERF_RECORD,
+        #  ("ssd", "ext4", "MWUL_overlay", "*", "bufferedio")),
+        # (Runner.CORE_FINE_GRAIN,
+        #  PerfMon.LEVEL_LOW,
+        #  ("ssd", "ext4", "MWCU_overlay", "*", "bufferedio")),
+        # (Runner.CORE_FINE_GRAIN,
+        #  PerfMon.LEVEL_LOW,
+        #  ("ssd", "ext4", "MWCL_overlay", "*", "bufferedio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,
